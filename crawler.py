@@ -5,6 +5,7 @@ import os
 from load import get_soup
 import re
 from cleaner import remove_non_text_tags, extract_text
+from random import randint
 
 wp_url_matcher = re.compile(r'^/wiki/(.*)')
 
@@ -15,7 +16,7 @@ def crawl(to_load_list):
         print("To Load List length: " + str(len(to_load_list)))
         if not to_load_list:
             break
-        to_load_url = to_load_list.pop()
+        to_load_url = to_load_list.pop(randint(0, len(to_load_list)))
         soup = get_soup("https://de.wikipedia.org/wiki/" + to_load_url)
         content = soup.find("div", {"id": "mw-content-text"})
         for a in content.find_all("a"):
