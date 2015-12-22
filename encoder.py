@@ -393,20 +393,17 @@ t["ʔ"] = t["?"]
 
 
 def encode(string):
-    encoded = b''
+    encoded = []
     for c in string:
         if c in t.keys():
-            encoded += t[c]
+            encoded.append(t[c])
         elif False:  # Set to true for debugging
             print("Fehlendes Zeichen: (" + c + ")")
-    return encoded
+    return b''.join(encoded)
 
 
 def decode(encoded_string):
-    string = ""
-    for b in encoded_string:
-        string += characters[b]
-    return string
+    return "".join([characters[b] for b in encoded_string])
 
 
 if __name__ == "__main__":
