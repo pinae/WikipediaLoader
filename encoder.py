@@ -1,16 +1,35 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+from __future__ import division, print_function, unicode_literals
+
 characters = list(
         "\n " +
         "abcdefghijklmnopqrstuvwxyzäöüABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜß" +
         "-*~|#&$¥€£¢\"';.,:!?=><()[]{}/\\_@%+^°§…†" +
         "0123456789" +
         "αβγδεζηθικλμνξοπρστυφχψωΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩῥός" +
-        "ØøŒœÀàáèéêçÇòóŝśùćĉąëęĝĥîìíïĵłŭùźżńñℓſūā")
+        "ØøŒœÀàáèéêçÇòóŝśùćĉąëęĝ")
 t = dict()
 for index, character in enumerate(characters):
-    t[character] = bytes([index])
+    t[character] = chr(index)
+t["ĥ"] = t["h"]
+t["î"] = t["i"]
+t["ì"] = t["i"]
+t["í"] = t["i"]
+t["ï"] = t["i"]
+t["ĵ"] = t["j"]
+t["ł"] = t["l"]
+t["ŭ"] = t["u"]
+t["ù"] = t["u"]
+t["ź"] = t["z"]
+t["ż"] = t["z"]
+t["ń"] = t["n"]
+t["ñ"] = t["n"]
+t["ℓ"] = t["l"]
+t["ſ"] = t["f"]
+t["ū"] = t["ü"]
+t["ā"] = t["ä"]
 t["„"] = t["\""]
 t["“"] = t["\""]
 t["”"] = t["\""]
@@ -391,6 +410,8 @@ t["г̨"] = t["g"]
 t["Ł"] = t["L"]
 t["ʔ"] = t["?"]
 
+character_count = len(characters)
+
 
 def encode(string):
     encoded = []
@@ -399,15 +420,15 @@ def encode(string):
             encoded.append(t[c])
         elif False:  # Set to true for debugging
             print("Fehlendes Zeichen: (" + c + ")")
-    return b''.join(encoded)
+    return ''.join(encoded)
 
 
 def decode(encoded_string):
-    return "".join([characters[b] for b in encoded_string])
+    return "".join([characters[ord(b)] for b in encoded_string])
 
 
 if __name__ == "__main__":
-    print(len(characters))
+    print(character_count)
     print("------------------------------------")
     print(decode(encode("xvlcwkhgfqß´uiaeosnrtdyüöäpzbm,.jÜÖÄPZBM–•JUIAEOSNRTDYXVLCWKHGFQẞ234567890" +
                         "--`°§ℓ»«$€„“”—#$|~`+%\"';\\/{}*?()-:@…_[]^!<>=&ſ¹²³›‹¢¥‚‘’^")))

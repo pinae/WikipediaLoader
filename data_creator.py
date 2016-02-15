@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+
 from __future__ import division, print_function, unicode_literals
 import os
 from random import shuffle
@@ -9,14 +10,17 @@ from encoder import encode
 
 
 def read_data():
-    raw_data = ''
+    raw_data = []
+    raw_data_size = 0
     filenames = os.listdir("articles")
     shuffle(filenames)
     for filename in filenames:
         with open(os.path.join("articles", filename), "r") as article:
-            raw_data += article.read() + "\n\n\n\n"
-    print("Raw data size: " + str(len(raw_data)))
-    return encode(raw_data)
+            chunk = encode(article.read() + "\n\n\n\n")
+            raw_data.append(chunk)
+            raw_data_size += len(chunk)
+    print("Raw data size: " + str(raw_data_size))
+    return ''.join(raw_data)
 
 
 def convert_to_batches(serial_data, length, bs):
@@ -46,12 +50,12 @@ def main():
     print("Using data directory:", bs_data_dir)
     print("Loading data ...")
     raw_data = read_data()
-    raw_data = raw_data[:100000000]
     print("Done.")
 
     print("Preparing data for Brainstorm ...")
-    raw_data = np.fromstring(raw_data, dtype=np.uint8)
-    unique, data = np.unique(raw_data, return_inverse=True)
+    raw_data = np.fromstring(raw_data, dtype=np.uint8, count=100000000)
+    # unique, data = np.unique(raw_data, return_inverse=True)
+    data = raw_data
 
     train_data = data[: -2 * num_test_chars]
     train_targets = data[1: -2 * num_test_chars + 1]
@@ -90,7 +94,7 @@ def main():
     dataset has been prepared expecting minibatches of {} sequences.
     """.format(seq_len, batch_size)
     f.attrs['description'] = description
-    f.attrs['unique'] = unique
+    # f.attrs['unique'] = unique
 
     variant = f.create_group('split')
     group = variant.create_group('training')

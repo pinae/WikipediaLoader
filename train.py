@@ -1,6 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 from __future__ import division, print_function, unicode_literals
+
+from encoder import character_count
 
 import os
 
@@ -8,7 +11,7 @@ import h5py
 
 import brainstorm as bs
 from brainstorm.data_iterators import OneHot, Minibatches
-from brainstorm.handlers import PyCudaHandler
+#from brainstorm.handlers import PyCudaHandler
 
 bs.global_rnd.set_seed(42)
 
@@ -22,18 +25,19 @@ x_tr, y_tr = ds['training']['default'][:], ds['training']['targets'][:]
 x_va, y_va = ds['validation']['default'][:], ds['validation']['targets'][:]
 
 getter_tr = OneHot(Minibatches(100, default=x_tr, targets=y_tr, shuffle=False),
-                   {'default': 205})
+                   {'default': character_count})
 getter_va = OneHot(Minibatches(100, default=x_va, targets=y_va, shuffle=False),
-                   {'default': 205})
+                   {'default': character_count})
 
 # ----------------------------- Set up Network ------------------------------ #
 
-network = bs.tools.create_net_from_spec('classification', 205, 205,
-                                        'L1000 L800 L700 L500')
+network = bs.tools.create_net_from_spec('classification', character_count, character_count,
+                                        'L1000 L800 L500')
+# network = bs.Network.from_hdf5('WikipediaDE_best.hdf5')
 
 # Uncomment next line to use the GPU
-network.set_handler(PyCudaHandler())
-network.initialize(bs.initializers.Gaussian(0.01))
+# network.set_handler(PyCudaHandler())
+network.initialize({"default": bs.initializers.Gaussian(0.1), "Lstm*": {"bf": 1}})
 
 # ----------------------------- Set up Trainer ------------------------------ #
 
