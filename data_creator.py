@@ -20,7 +20,7 @@ def read_data():
             raw_data.append(chunk)
             raw_data_size += len(chunk)
     print("Raw data size: " + str(raw_data_size))
-    return ''.join(raw_data)
+    return b''.join(raw_data)
 
 
 def convert_to_batches(serial_data, length, bs):
@@ -53,9 +53,8 @@ def main():
     print("Done.")
 
     print("Preparing data for Brainstorm ...")
-    raw_data = np.fromstring(raw_data, dtype=np.uint8, count=100000000)
+    data = np.fromstring(raw_data, dtype=np.uint8, count=100000000)
     # unique, data = np.unique(raw_data, return_inverse=True)
-    data = raw_data
 
     train_data = data[: -2 * num_test_chars]
     train_targets = data[1: -2 * num_test_chars + 1]

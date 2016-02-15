@@ -12,7 +12,7 @@ characters = list(
         "ØøŒœÀàáèéêçÇòóŝśùćĉąëęĝ")
 t = dict()
 for index, character in enumerate(characters):
-    t[character] = chr(index)
+    t[character] = bytes([index])
 t["ĥ"] = t["h"]
 t["î"] = t["i"]
 t["ì"] = t["i"]
@@ -420,11 +420,11 @@ def encode(string):
             encoded.append(t[c])
         elif False:  # Set to true for debugging
             print("Fehlendes Zeichen: (" + c + ")")
-    return ''.join(encoded)
+    return b''.join(encoded)
 
 
 def decode(encoded_string):
-    return "".join([characters[ord(b)] for b in encoded_string])
+    return "".join([characters[b] for b in encoded_string])
 
 
 if __name__ == "__main__":
