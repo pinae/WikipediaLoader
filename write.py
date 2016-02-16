@@ -4,10 +4,9 @@
 from __future__ import division, print_function, unicode_literals
 import brainstorm as bs
 import numpy as np
-import zipfile
 import h5py
 from time import sleep
-from encoder import encode, decode
+from encoder import encode, decode, character_count
 import os
 
 
@@ -16,30 +15,26 @@ def get_char(output):
     cumsum = np.cumsum(output.squeeze())
     sample = np.random.rand()
     idx = np.argmax(cumsum > sample)
-    return decode([chr(unique[idx])]), idx
+    return decode(bytes([idx])), idx
 
 
 data_dir = os.environ.get('BRAINSTORM_DATA_DIR', '../data')
 data_file = os.path.join(data_dir, 'WikipediaDE.hdf5')
 with h5py.File(data_file, 'r') as f:
-    unique = f.attrs['unique']
-    eye = np.eye(unique.size)
+    eye = np.eye(character_count)
 network = bs.Network.from_hdf5('WikipediaDE_best.hdf5')
 start = 'Auf der Konsole starten Programme '
-array = np.array([np.where(unique == ord(encode(char))) for char in start]).reshape((len(start), 1, 1))
+array = np.array([int(encode(char)[0]) for char in start], dtype=np.uint8).reshape((len(start), 1, 1))
 context = None
 network._buffer_manager.clear_context()
 
-#np.random.seed(1337)
+# np.random.seed(1337)
 
 text = []
-#for i in range(1500):
 i = 0
-print(unique.size)
-print(array.shape)
 print(start)
 while True:
-    data = eye[array].reshape((array.shape[0], array.shape[1], unique.size))
+    data = eye[array].reshape((array.shape[0], array.shape[1], character_count))
     network.provide_external_data({'default': data}, all_inputs=False)
     if i == 0:
         network.forward_pass()
@@ -50,7 +45,7 @@ while True:
     char, next_input = get_char(output)
     text.append(char)
     array = next_input.reshape((1, 1, 1))
-    if len(text) > 70 and ''.join([char]) == " ":
+    if (len(text) > 70 and ''.join([char]) == " ") or len(text) >= 99:
         print(''.join(text))
         text = []
     line = ''.join(text)
@@ -60,4 +55,4 @@ while True:
     else:
         print(''.join(text), end="\r", flush=True)
     i += 1
-    sleep(0.05)
+    sleep(0.01)
